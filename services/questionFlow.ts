@@ -10,5 +10,5 @@ export const QUESTIONS = [
 ];
 
 export function getNextQuestion(answers: Record<string, any>={}) {
-  return QUESTIONS.find(q => !answers[q.key]==undefined);
+  return QUESTIONS.find(q => answers[q.key] === undefined);
 }
