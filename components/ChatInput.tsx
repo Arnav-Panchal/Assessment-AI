@@ -11,31 +11,31 @@ export default function ChatInput() {
   const [inputValue, setInputValue] = useState('')
 
   // ✅ Fetch next question function
-  async function fetchNextQuestion(updatedAnswers: any) {
+  async function fetchNextQuestion(updatedAnswers: any, lastAnswer?: string) {
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers: updatedAnswers })
+        body: JSON.stringify({ answers: updatedAnswers, lastAnswer })
       })
       const data = await res.json()
-
+  
       if (data.done) {
         if (Object.keys(updatedAnswers).length === 0) return
-      
+  
         router.push(
           `/results?data=${encodeURIComponent(JSON.stringify(updatedAnswers))}`
         )
         return
       }
-      
-
+  
       setCurrentQuestion(data.question)
       setCurrentKey(data.key)
     } catch (err) {
       console.error(err)
     }
   }
+  
 
   // ✅ Use effect correctly
   useEffect(() => {
@@ -47,13 +47,22 @@ export default function ChatInput() {
 
   async function handleSubmit() {
     if (!currentKey || !inputValue.trim()) return
-
+  
     const updatedAnswers = { ...answers, [currentKey]: inputValue }
     setAnswers(updatedAnswers)
     setInputValue('')
-
-    await fetchNextQuestion(updatedAnswers)
+  
+    // Pass the lastAnswer for AI normalization
+    await fetchNextQuestion(updatedAnswers, inputValue)
   }
+
+  useEffect(() => {
+    const init = async () => {
+      await fetchNextQuestion({})
+    }
+    init()
+  }, [])
+  
 
   return (
     <div className="space-y-4">
