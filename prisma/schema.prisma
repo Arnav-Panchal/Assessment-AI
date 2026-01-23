@@ -1,0 +1,14 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AdminPrompt {
+  id        String   @id @default(uuid())
+  program   String   @unique
+  content   String
+  updatedAt DateTime @updatedAt
+}
