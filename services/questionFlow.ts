@@ -9,6 +9,6 @@ export const QUESTIONS = [
   { key: "language", text: "What is your CLB language level?" }
 ];
 
-export function getNextQuestion(answers: Record<string, any>={}) {
-  return QUESTIONS.find(q => !answers[q.key]==undefined);
+export function getNextQuestion(answers: Record<string, any> = {}) {
+  return QUESTIONS.find(q => !(q.key in answers));
 }

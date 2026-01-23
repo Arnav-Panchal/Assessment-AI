@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
   "name": "ai-assesssment",
-=======
-  "name": "quiz-ai",
->>>>>>> 4362e8f2c0cc181e4ec722bf3558d863a9e80768
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,19 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "next": "16.1.4",
-    "nodemon": "^3.1.11",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
-=======
     "@ai-sdk/react": "^3.0.51",
     "ai": "^6.0.49",
     "next": "16.1.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "zod": "^4.3.6"
->>>>>>> 4362e8f2c0cc181e4ec722bf3558d863a9e80768
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
