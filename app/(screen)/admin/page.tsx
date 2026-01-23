@@ -15,6 +15,9 @@ export default async function AdminPage() {
         <Link href="/admin/submissions" className="block w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700">
           View Submissions
         </Link>
+        <Link href="/admin/submissions" className="block w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700">
+          View Submissions
+        </Link>
       </div>
     </main>
   )
