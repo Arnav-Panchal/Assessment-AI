@@ -21,9 +21,14 @@ export default function ChatInput() {
       const data = await res.json()
 
       if (data.done) {
-        router.push(`/results?data=${encodeURIComponent(JSON.stringify(updatedAnswers))}`)
+        if (Object.keys(updatedAnswers).length === 0) return
+      
+        router.push(
+          `/results?data=${encodeURIComponent(JSON.stringify(updatedAnswers))}`
+        )
         return
       }
+      
 
       setCurrentQuestion(data.question)
       setCurrentKey(data.key)
