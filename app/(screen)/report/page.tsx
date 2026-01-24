@@ -1,4 +1,6 @@
-'use client' // ✅ ensures this is a client-side component (prevents prerender/build errors)
+'use client' // 
+
+export const dynamic = 'force-dynamic'
 
 export const dynamic = 'force-dynamic'
 
