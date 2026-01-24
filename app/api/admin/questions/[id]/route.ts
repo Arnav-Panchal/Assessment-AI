@@ -4,17 +4,20 @@ import { query } from "@/lib/db";
 
 export async function PUT(req: NextRequest, context: { params: { id: string } | Promise<{ id: string }> }) {
   try {
-    const { text } = await req.json();
+    // Changed from { text } to { question_text }
+    const { question_text } = await req.json();
 
     // Unwrap params if it is a Promise
     const params = await context.params;
     const id = parseInt(params.id, 10);
 
-    if (!text || !id) {
+    // Updated validation to check question_text
+    if (!question_text || !id) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
-    await query("UPDATE questions SET question_text = $1 WHERE id = $2", [text, id]);
+    // Use question_text variable instead of text
+    await query("UPDATE questions SET question_text = $1 WHERE id = $2", [question_text, id]);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error(err);
