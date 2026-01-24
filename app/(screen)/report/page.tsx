@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import { useEffect, useState, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { Download, Mail, FileText, Loader2, CheckCircle, XCircle } from 'lucide-react'
 
 // ✅ Separate component that uses useSearchParams
 function ReportContent() {
@@ -107,63 +108,127 @@ function ReportContent() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white pb-24">
+    <main className="min-h-screen bg-background px-4 py-8">
       {/* Loading state */}
       {status === 'generating' && (
         <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center space-y-4 p-6 bg-gray-900 border border-gray-800 rounded-lg">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
-            <h1 className="text-2xl font-bold">Generating Your Report</h1>
-            <p className="text-gray-400">Please wait...</p>
+          <div className="bg-card text-card-foreground rounded-2xl shadow-2xl border border-border p-8 text-center space-y-4 max-w-md">
+            <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mx-auto">
+              <Loader2 size={24} className="text-accent animate-spin" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Generating Your Report</h1>
+            <p className="text-muted-foreground">Please wait...</p>
           </div>
         </div>
       )}
 
       {/* Success state */}
       {status === 'success' && pdfUrl && (
-        <div className="max-w-6xl mx-auto p-6 space-y-6">
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-5 shadow flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Your Assessment Report</h1>
-            <button
-              onClick={handleDownload}
-              className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-semibold"
-            >
-              Download PDF
-            </button>
-          </div>
-
-          {/* PDF Viewer */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg shadow" style={{ height: 'calc(100vh - 230px)' }}>
-            <iframe src={pdfUrl} className="w-full h-full rounded" title="Assessment Report PDF" />
-          </div>
-
-          {/* Email section */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 mt-4">
-            <div className="flex gap-3">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value)
-                  if (emailStatus !== 'idle') setEmailStatus('idle')
-                }}
-                className="flex-1 bg-gray-800 border border-gray-700 rounded px-4 py-2 text-white"
-              />
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="bg-card text-card-foreground rounded-2xl shadow-2xl border border-border overflow-hidden">
+            <div className="border-b border-border px-6 py-5 bg-secondary/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                  <FileText size={24} className="text-accent" />
+                  Your Assessment Report
+                </h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Review and download your immigration assessment
+                </p>
+              </div>
               <button
-                onClick={handleSendEmail}
-                disabled={!answers || emailStatus === 'sending' || emailStatus === 'sent'}
-                className={`px-6 py-2 rounded font-semibold transition ${emailStatus === 'sent' ? 'bg-green-700' : 'bg-green-600 hover:bg-green-700'} disabled:opacity-50`}
+                onClick={handleDownload}
+                className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-200 whitespace-nowrap"
               >
-                {emailStatus === 'idle' && 'Send Email'}
-                {emailStatus === 'sending' && 'Sending...'}
-                {emailStatus === 'sent' && 'Sent! ✅'}
-                {emailStatus === 'error' && 'Retry'}
+                <Download size={20} />
+                <span>Download PDF</span>
               </button>
             </div>
 
-            {emailStatus === 'sent' && <p className="text-green-400 text-sm mt-2">📧 Email sent successfully to <b>{email}</b></p>}
-            {emailStatus === 'error' && <p className="text-red-400 text-sm mt-2">❌ Failed to send email. Try again.</p>}
+            {/* PDF Viewer */}
+            <div className="p-6">
+              <div className="bg-secondary/10 border border-secondary/20 rounded-xl overflow-hidden" style={{ height: 'calc(100vh - 400px)', minHeight: '500px' }}>
+                <iframe src={pdfUrl} className="w-full h-full" title="Assessment Report PDF" />
+              </div>
+            </div>
+          </div>
+
+          {/* Email section */}
+          <div className="bg-card text-card-foreground rounded-2xl shadow-2xl border border-border overflow-hidden">
+            <div className="border-b border-border px-6 py-4 bg-secondary/5">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Mail size={20} className="text-accent" />
+                Email Report
+              </h2>
+            </div>
+            
+            <div className="px-6 py-6">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  placeholder="Enter your email address..."
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    if (emailStatus !== 'idle') setEmailStatus('idle')
+                  }}
+                  className="flex-1 bg-input border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
+                />
+                <button
+                  onClick={handleSendEmail}
+                  disabled={!answers || emailStatus === 'sending' || emailStatus === 'sent' || !email.trim()}
+                  className={`px-6 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-200 whitespace-nowrap ${
+                    emailStatus === 'sent' 
+                      ? 'bg-green-600 hover:bg-green-700 text-white' 
+                      : 'bg-accent hover:bg-accent/90 text-accent-foreground'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {emailStatus === 'idle' && (
+                    <>
+                      <Mail size={20} />
+                      <span>Send Email</span>
+                    </>
+                  )}
+                  {emailStatus === 'sending' && (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  )}
+                  {emailStatus === 'sent' && (
+                    <>
+                      <CheckCircle size={20} />
+                      <span>Sent!</span>
+                    </>
+                  )}
+                  {emailStatus === 'error' && (
+                    <>
+                      <XCircle size={20} />
+                      <span>Retry</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {emailStatus === 'sent' && (
+                <div className="mt-4 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">
+                  <p className="text-green-600 text-sm flex items-center gap-2">
+                    <CheckCircle size={16} />
+                    Email sent successfully to <b>{email}</b>
+                  </p>
+                </div>
+              )}
+              
+              {emailStatus === 'error' && (
+                <div className="mt-4 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+                  <p className="text-red-500 text-sm flex items-center gap-2">
+                    <XCircle size={16} />
+                    Failed to send email. Please try again.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -171,9 +236,12 @@ function ReportContent() {
       {/* Error state */}
       {status === 'error' && (
         <div className="flex items-center justify-center min-h-screen">
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 w-full max-w-3xl shadow text-center space-y-4">
-            <h1 className="text-2xl font-bold text-red-500">Error</h1>
-            <p className="text-gray-400">Failed to generate report. Please try again.</p>
+          <div className="bg-card text-card-foreground rounded-2xl shadow-2xl border border-border p-8 text-center space-y-4 max-w-md">
+            <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto">
+              <XCircle size={24} className="text-red-500" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Error</h1>
+            <p className="text-muted-foreground">Failed to generate report. Please try again.</p>
           </div>
         </div>
       )}
@@ -185,10 +253,12 @@ function ReportContent() {
 export default function ReportPage() {
   return (
     <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen bg-gray-950">
-        <div className="text-center space-y-4 p-6 bg-gray-900 border border-gray-800 rounded-lg">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
-          <h1 className="text-2xl font-bold text-white">Loading...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="bg-card text-card-foreground rounded-2xl shadow-2xl border border-border p-8 text-center space-y-4 max-w-md">
+          <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mx-auto">
+            <Loader2 size={24} className="text-accent animate-spin" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">Loading...</h1>
         </div>
       </div>
     }>
