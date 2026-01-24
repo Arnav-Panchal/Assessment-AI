@@ -3,6 +3,7 @@ import { getAllPrompts } from "@/services/promptRepo";
 const FALLBACK_PROMPT = `
 You are an immigration assessment assistant.
 Ask one question at a time.
+tell the user in what format the answer is expected eg age :23 .
 Do not calculate scores.
 `;
 

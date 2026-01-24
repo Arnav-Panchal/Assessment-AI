@@ -1,11 +1,12 @@
 
 import { NextResponse } from "next/server";
 import { calculateScoreWithSummary } from "@/services/scoring/scoreWithSummary";
-
+import { mapAnswersForScoring } from "@/services/scoring/mapAnswers";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   const { answers } = await req.json();
+  console.log("aanswers  ************",answers)
 
   if (!answers) {
     return NextResponse.json(
@@ -13,8 +14,9 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-
-  const result = await calculateScoreWithSummary(answers);
+  const mappedAnswers = mapAnswersForScoring(answers);
+  console.log("mapped answeeers", mappedAnswers)
+  const result = await calculateScoreWithSummary(mappedAnswers);
 
   return NextResponse.json(result);
 }

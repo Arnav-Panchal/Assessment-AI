@@ -3,27 +3,41 @@ import { query } from "@/lib/db";
 
 interface Question {
   id: number;
-  key: string;
+  key: string; // scoring_field
   question_text: string;
+  question_type: string;
+  min: number | null;
+  max: number | null;
   program: string;
 }
 
 export async function getQuestionsFromDB(program?: string): Promise<Question[]> {
   try {
     const res = await query(
-      "SELECT id, question_text, program FROM questions ORDER BY id ASC"
+      `SELECT 
+         id,
+         question_text,
+         question_type,
+         program,
+         scoring_field,
+         min_value,
+         max_value
+       FROM questions
+       ORDER BY display_order ASC`
     );
 
-    const questions = res.rows.map((q: any) => ({
+    const questions: Question[] = res.rows.map((q: any) => ({
       id: q.id,
-      key: `q${q.id}`,
+      key: q.scoring_field,
       question_text: q.question_text,
+      question_type: q.question_type,
+      min: q.min_value,
+      max: q.max_value,
       program: q.program,
     }));
 
-    // Filter by program if specified
     if (program) {
-      return questions.filter((q: Question) => q.program === program);
+      return questions.filter(q => q.program === program);
     }
 
     return questions;

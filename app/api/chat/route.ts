@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
-import { generateText } from "ai";
-import { model } from "@/lib/ai";
 import { getNextQuestion } from "@/services/questionFlow";
 import { askLLM } from "@/services/llm";
 import { getSystemPrompt } from "@/services/getSystemPrompt";
 
 export const runtime = "nodejs";
 
-// Type for request body
 interface ChatRequestBody {
   answers?: Record<string, any>;
   lastAnswer?: string;
@@ -19,20 +16,19 @@ export async function POST(req: Request) {
     const body: ChatRequestBody = await req.json();
     const { answers = {}, lastAnswer, program } = body;
 
-    // 1️⃣ Get the next unanswered question (NOW WITH AWAIT)
+    // 1️⃣ Get current question
     const currentQuestion = await getNextQuestion(answers, program);
 
     if (!currentQuestion) {
-      // No more questions left
       return NextResponse.json({ done: true });
     }
 
-    // 2️⃣ FIRST CALL → Just ask the question (no lastAnswer yet)
-    if (!lastAnswer) {
+    // 2️⃣ First request → just ask the question
+    if (lastAnswer === undefined) {
       const systemPrompt = await getSystemPrompt(program);
       const llmQuestion = await askLLM(
         systemPrompt,
-        `Ask the user this question clearly: "${currentQuestion.question_text}"` // CHANGED FROM .text
+        `Ask the user this question clearly: "${currentQuestion.question_text}"`
       );
 
       return NextResponse.json({
@@ -42,49 +38,42 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3️⃣ Normalize last answer using AI
-    const { text } = await generateText({
-      model,
-      temperature: 0,
-      system: `
-You are a data normalizer.
-Convert user answers into clean JSON.
-Return ONLY valid JSON.
-No explanations.
-`,
-      prompt: `
-Question key: ${currentQuestion.key}
-User answer: "${lastAnswer}"
+    // 3️⃣ Validate numeric answer
+    const value = Number(lastAnswer);
 
-Return JSON in this format:
-{ "${currentQuestion.key}": value }
-`,
-    });
-
-    let parsedAnswer: Record<string, any>;
-    try {
-      parsedAnswer = JSON.parse(text);
-    } catch {
+    if (Number.isNaN(value)) {
       return NextResponse.json({
-        error: "Could not understand your answer. Please reply clearly.",
+        error: "Please enter a valid number.",
       });
     }
 
-    // 4️⃣ Merge answers
-    const updatedAnswers = { ...answers, ...parsedAnswer };
+    if (
+      (currentQuestion.min !== null && value < currentQuestion.min) ||
+      (currentQuestion.max !== null && value > currentQuestion.max)
+    ) {
+      return NextResponse.json({
+        error: `Please enter a value between ${currentQuestion.min} and ${currentQuestion.max}.`,
+      });
+    }
 
-    // 5️⃣ Get next question (NOW WITH AWAIT)
+    // 4️⃣ Save answer
+    const updatedAnswers = {
+      ...answers,
+      [currentQuestion.key]: value,
+    };
+
+    // 5️⃣ Get next question
     const nextQuestion = await getNextQuestion(updatedAnswers, program);
 
     if (!nextQuestion) {
       return NextResponse.json({ done: true });
     }
 
-    // 6️⃣ Ask LLM to phrase the next question
+    // 6️⃣ Ask next question
     const systemPrompt = await getSystemPrompt(program);
     const llmQuestion = await askLLM(
       systemPrompt,
-      `Ask the user this question clearly: "${nextQuestion.question_text}"` // CHANGED FROM .text
+      `Ask the user this question clearly: "${nextQuestion.question_text}"`
     );
 
     return NextResponse.json({

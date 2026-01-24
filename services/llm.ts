@@ -1,8 +1,6 @@
 import { groq } from "@ai-sdk/groq";
 import { generateText } from "ai";
 
-// Supported & fast Groq model
-// const model = groq("mixtral-8x7b-32768");
 const model=groq("llama-3.1-8b-instant")
 
 export async function askLLM(
