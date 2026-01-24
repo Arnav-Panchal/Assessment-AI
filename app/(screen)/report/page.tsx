@@ -1,11 +1,12 @@
-'use client' // 
+'use client'
 
 export const dynamic = 'force-dynamic'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-export default function ReportPage() {
+// ✅ Separate component that uses useSearchParams
+function ReportContent() {
   const searchParams = useSearchParams()
 
   // status of PDF generation
@@ -177,5 +178,21 @@ export default function ReportPage() {
         </div>
       )}
     </main>
+  )
+}
+
+// ✅ Wrap the component with Suspense
+export default function ReportPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen bg-gray-950">
+        <div className="text-center space-y-4 p-6 bg-gray-900 border border-gray-800 rounded-lg">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
+          <h1 className="text-2xl font-bold text-white">Loading...</h1>
+        </div>
+      </div>
+    }>
+      <ReportContent />
+    </Suspense>
   )
 }
