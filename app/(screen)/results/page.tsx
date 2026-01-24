@@ -13,12 +13,13 @@ export default async function ResultsPage({
 
   const answers = JSON.parse(decodeURIComponent(params.data))
 
-  const res = await fetch("http://localhost:3000/api/score", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/score`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ answers }),
     cache: "no-store",
   })
+  
 
   const { bcScore, nsScore, summary } = await res.json()
 
