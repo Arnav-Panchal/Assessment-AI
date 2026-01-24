@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic'
+
+
 'use client' // ✅ ensures this is a client-side component (prevents prerender/build errors)
 
 import { useEffect, useState, useRef } from 'react'
