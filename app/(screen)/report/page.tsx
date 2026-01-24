@@ -1,29 +1,37 @@
-'use client'
+'use client' // ✅ ensures this is a client-side component (prevents prerender/build errors)
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 export default function ReportPage() {
   const searchParams = useSearchParams()
 
+  // status of PDF generation
   const [status, setStatus] = useState<'generating' | 'success' | 'error'>('generating')
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
 
-  // store the report data to send via email
+  // PDF URL to display and download
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
+  const pdfUrlRef = useRef<string | null>(null) // ✅ store PDF URL for cleanup
+
+  // report data
   const [answers, setAnswers] = useState<any>(null)
   const [bcScore, setBcScore] = useState<number | null>(null)
   const [nsScore, setNsScore] = useState<number | null>(null)
   const [summary, setSummary] = useState<string | null>(null)
 
+  // email state
   const [email, setEmail] = useState('')
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
   useEffect(() => {
     const data = searchParams.get('data')
+
+    // ✅ handle missing query param gracefully
     if (!data) return setStatus('error')
 
     const generateReport = async () => {
       try {
+        // ✅ parse report data from query string
         const parsed = JSON.parse(decodeURIComponent(data))
         const { answers, bcScore, nsScore, summary } = parsed
 
@@ -32,6 +40,7 @@ export default function ReportPage() {
         setNsScore(nsScore)
         setSummary(summary)
 
+        // ✅ fetch report PDF from internal API
         const response = await fetch('/api/report', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -40,8 +49,11 @@ export default function ReportPage() {
 
         if (!response.ok) throw new Error('Failed to generate report')
 
+        // ✅ create object URL for PDF
         const blob = await response.blob()
-        setPdfUrl(window.URL.createObjectURL(blob))
+        const url = window.URL.createObjectURL(blob)
+        pdfUrlRef.current = url // store in ref for cleanup
+        setPdfUrl(url)
 
         setStatus('success')
       } catch (err) {
@@ -52,11 +64,13 @@ export default function ReportPage() {
 
     generateReport()
 
+    // ✅ cleanup PDF object URL on unmount
     return () => {
-      if (pdfUrl) window.URL.revokeObjectURL(pdfUrl)
+      if (pdfUrlRef.current) window.URL.revokeObjectURL(pdfUrlRef.current)
     }
   }, [searchParams])
 
+  // ✅ download PDF
   const handleDownload = () => {
     if (!pdfUrl) return
     const a = document.createElement('a')
@@ -67,6 +81,7 @@ export default function ReportPage() {
     document.body.removeChild(a)
   }
 
+  // ✅ send PDF via email
   const handleSendEmail = async () => {
     if (!email || !answers || bcScore == null || nsScore == null || !summary) return
 
@@ -90,6 +105,7 @@ export default function ReportPage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white pb-24">
+      {/* Loading state */}
       {status === 'generating' && (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center space-y-4 p-6 bg-gray-900 border border-gray-800 rounded-lg">
@@ -100,6 +116,7 @@ export default function ReportPage() {
         </div>
       )}
 
+      {/* Success state */}
       {status === 'success' && pdfUrl && (
         <div className="max-w-6xl mx-auto p-6 space-y-6">
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-5 shadow flex justify-between items-center">
@@ -112,6 +129,7 @@ export default function ReportPage() {
             </button>
           </div>
 
+          {/* PDF Viewer */}
           <div className="bg-gray-900 border border-gray-800 rounded-lg shadow" style={{ height: 'calc(100vh - 230px)' }}>
             <iframe src={pdfUrl} className="w-full h-full rounded" title="Assessment Report PDF" />
           </div>
@@ -147,6 +165,7 @@ export default function ReportPage() {
         </div>
       )}
 
+      {/* Error state */}
       {status === 'error' && (
         <div className="flex items-center justify-center min-h-screen">
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 w-full max-w-3xl shadow text-center space-y-4">
