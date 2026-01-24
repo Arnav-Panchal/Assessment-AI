@@ -1,4 +1,3 @@
-
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 export async function generatePDF(data: {
@@ -91,46 +90,3 @@ export async function generatePDF(data: {
   return await pdfDoc.save();
 }
 
-// import { PDFDocument, StandardFonts } from "pdf-lib";
-
-// export async function generatePDF(data: {
-//   answers: any;
-//   bcScore: number;
-//   nsScore: number;
-// }) {
-//   const pdfDoc = await PDFDocument.create();
-//   const page = pdfDoc.addPage();
-//   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-//   const { width, height } = page.getSize();
-//   let y = height - 40;
-
-//   page.drawText("Immigration Eligibility Assessment Summary", {
-//     x: 40,
-//     y,
-//     size: 14,
-//     font,
-//   });
-
-//   y -= 30;
-
-//   page.drawText(`BC Score: ${data.bcScore}`, { x: 40, y, size: 12, font });
-//   y -= 20;
-//   page.drawText(`Nova Scotia Score: ${data.nsScore}`, {
-//     x: 40,
-//     y,
-//     size: 12,
-//     font,
-//   });
-
-//   y -= 30;
-//   page.drawText("Applicant Answers:", { x: 40, y, size: 12, font });
-//   y -= 20;
-
-//   for (const [key, value] of Object.entries(data.answers)) {
-//     page.drawText(`${key}: ${value}`, { x: 40, y, size: 10, font });
-//     y -= 15;
-//   }
-
-//   return await pdfDoc.save();
-// }

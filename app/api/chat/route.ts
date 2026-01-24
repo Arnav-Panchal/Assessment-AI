@@ -1,82 +1,102 @@
-import { NextResponse } from 'next/server'
-import { generateText } from 'ai'
-import { model } from '@/lib/ai'
-import { getNextQuestion, QUESTIONS } from '@/services/questionFlow'
+import { NextResponse } from "next/server";
+import { generateText } from "ai";
+import { model } from "@/lib/ai";
+import { getNextQuestion } from "@/services/questionFlow";
+import { askLLM } from "@/services/llm";
+import { getSystemPrompt } from "@/services/getSystemPrompt";
+
+export const runtime = "nodejs";
+
+// Type for request body
+interface ChatRequestBody {
+  answers?: Record<string, any>;
+  lastAnswer?: string;
+  program?: string;
+}
 
 export async function POST(req: Request) {
   try {
-    const { answers = {}, lastAnswer }: { answers?: Record<string, any>, lastAnswer?: string } = await req.json()
+    const body: ChatRequestBody = await req.json();
+    const { answers = {}, lastAnswer, program } = body;
 
-    // 1️⃣ Get next unanswered question
-    const nextQuestion = getNextQuestion(answers)
+    // 1️⃣ Get the next unanswered question (NOW WITH AWAIT)
+    const currentQuestion = await getNextQuestion(answers, program);
 
-    // First call: just return the first question
+    if (!currentQuestion) {
+      // No more questions left
+      return NextResponse.json({ done: true });
+    }
+
+    // 2️⃣ FIRST CALL → Just ask the question (no lastAnswer yet)
     if (!lastAnswer) {
-      if (!nextQuestion) {
-        return NextResponse.json({ done: true })
-      }
+      const systemPrompt = await getSystemPrompt(program);
+      const llmQuestion = await askLLM(
+        systemPrompt,
+        `Ask the user this question clearly: "${currentQuestion.question_text}"` // CHANGED FROM .text
+      );
 
       return NextResponse.json({
         done: false,
-        question: nextQuestion.text,
-        key: nextQuestion.key
-      })
+        question: llmQuestion,
+        key: currentQuestion.key,
+      });
     }
-    
 
-    // 2️⃣ Use AI to normalize the last answer
+    // 3️⃣ Normalize last answer using AI
     const { text } = await generateText({
       model,
       temperature: 0,
       system: `
 You are a data normalizer.
 Convert user answers into clean JSON.
-Return ONLY valid JSON with key/value.
+Return ONLY valid JSON.
 No explanations.
 `,
       prompt: `
-Question key: ${nextQuestion?.key}
+Question key: ${currentQuestion.key}
 User answer: "${lastAnswer}"
 
 Return JSON in this format:
-{ "${nextQuestion?.key}": value }
-`
-    })
+{ "${currentQuestion.key}": value }
+`,
+    });
 
-    console.log(text)
-
-    
-
-    // 3️⃣ Parse AI output safely
-    let parsedAnswer: Record<string, any> = {}
+    let parsedAnswer: Record<string, any>;
     try {
-      parsedAnswer = JSON.parse(text)
-    } catch (err) {
-      console.error('Failed to parse AI response:', text)
+      parsedAnswer = JSON.parse(text);
+    } catch {
       return NextResponse.json({
-        error: 'Could not understand your answer. Please enter clearly.'
-      })
+        error: "Could not understand your answer. Please reply clearly.",
+      });
     }
 
-    // 4️⃣ Merge with existing answers
-    const updatedAnswers = { ...answers, ...parsedAnswer }
+    // 4️⃣ Merge answers
+    const updatedAnswers = { ...answers, ...parsedAnswer };
 
-    console.log("lastAnswer");
+    // 5️⃣ Get next question (NOW WITH AWAIT)
+    const nextQuestion = await getNextQuestion(updatedAnswers, program);
 
-    // 5️⃣ Get the next question after updating
-    const next = getNextQuestion(updatedAnswers)
-
-    if (!next) {
-      return NextResponse.json({ done: true })
+    if (!nextQuestion) {
+      return NextResponse.json({ done: true });
     }
+
+    // 6️⃣ Ask LLM to phrase the next question
+    const systemPrompt = await getSystemPrompt(program);
+    const llmQuestion = await askLLM(
+      systemPrompt,
+      `Ask the user this question clearly: "${nextQuestion.question_text}"` // CHANGED FROM .text
+    );
 
     return NextResponse.json({
       done: false,
-      question: next.text,
-      key: next.key
-    })
+      question: llmQuestion,
+      key: nextQuestion.key,
+    });
   } catch (err) {
-    console.error(err)
-    return NextResponse.json({ error: 'Server error. Try again later.' }, { status: 500 })
+    console.error(err);
+    return NextResponse.json(
+      { error: "Server error. Try again later." },
+      { status: 500 }
+    );
   }
 }
