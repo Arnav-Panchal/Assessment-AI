@@ -35,7 +35,7 @@ export default function RootLayout({
               Home
             </Link>
             <Link href="/login" className="hover:underline">
-              login
+              DashBoard
             </Link>
           </div>
         </nav>
