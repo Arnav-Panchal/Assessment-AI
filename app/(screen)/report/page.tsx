@@ -1,5 +1,7 @@
 'use client' // ✅ ensures this is a client-side component (prevents prerender/build errors)
 
+export const dynamic = 'force-dynamic'
+
 import { useEffect, useState, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 
