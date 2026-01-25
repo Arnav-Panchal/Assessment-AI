@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Immigration Chatbot
 
-## Getting Started
+## 📌 Project Overview
 
-First, run the development server:
+**Immigration Chatbot** is an AI-powered assessment chatbot designed to evaluate immigration eligibility for **British Columbia** and **Nova Scotia** programs. The chatbot dynamically asks users program-specific questions and calculates scores based on their responses. A detailed assessment summary is generated, which users can view, download as a report, and share via email.
+
+Admins can manage and update the chatbot's question flow directly through an admin dashboard, making the system flexible and easily adaptable to policy or criteria changes.
+
+🔗 **Live Demo:** [https://assessment-orcin-nine.vercel.app/](https://assessment-orcin-nine.vercel.app/)
+
+---
+
+## 🚀 Key Features
+
+* 🤖 Interactive AI-based chatbot for immigration assessment
+* 🇨🇦 Supports **British Columbia** and **Nova Scotia** programs
+* 📊 Automatic score calculation based on user answers
+* 📄 Generate detailed assessment summary & report
+* ⬇️ Download report as a PDF
+* 📧 Email report directly to the user
+* 🛠️ Admin dashboard to modify chatbot questions dynamically
+* ☁️ Fully deployed on Vercel
+
+---
+
+## 🧰 Tech Stack
+
+* **Language:** JavaScript / TypeScript
+* **Frontend & Backend:** Next.js
+* **AI Integration:** Vercel AI SDK
+* **Database:** PostgreSQL
+* **Hosting:** Vercel
+
+---
+
+## 🏗️ Project Use Case
+
+This project can be used as an **immigration assessment tool** to help applicants:
+
+* Understand their eligibility
+* Get instant feedback and scoring
+* Receive a professional summary report
+
+It is suitable for:
+
+* Immigration consultants
+* Assessment platforms
+* Educational or demo purposes
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1️⃣ Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd immigration-chatbot
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2️⃣ Install Dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+# or
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3️⃣ Environment Variables
 
-## Learn More
+Create a `.env` file and configure the following variables:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+DATABASE_URL=
+EMAIL_USER=
+EMAIL_PASS=
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4️⃣ Run the Project Locally
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm dev
+# or
+npm run dev
+```
 
-## Deploy on Vercel
+The app will run at `http://localhost:3000`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📊 Admin Dashboard
+
+* Modify and manage chatbot questions
+* Update program-specific flows
+* Control scoring logic dynamically
+
+---
+
+## 📈 Future Improvements
+
+* Add more Canadian immigration programs
+* Improve AI-based answer validation
+* Add user authentication
+* Export reports in multiple formats
+
+---
+
+## 👨‍💻 Author
+
+**Arnav Panchal**
+
+If you like this project, feel free to ⭐ the repository and share feedback!
