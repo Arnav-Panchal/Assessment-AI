@@ -1,9 +1,6 @@
-import ChatInput from "@/components/ChatInput"
+// app/page.js
+import LandingPage from "@/components/LandingPage"
 
-export default function ChatPage() {
-  return (
-    <main className="min-h-screen bg-background">
-      <ChatInput />
-    </main>
-  )
+export default function Home() {
+  return <LandingPage />
 }

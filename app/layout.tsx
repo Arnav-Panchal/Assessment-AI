@@ -40,21 +40,21 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans antialiased bg-background text-foreground`}>
         {/* Navigation */}
-        <nav className="border-b border-border bg-secondary/5 sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <Link href="/" className="text-xl font-bold text-foreground hover:text-accent transition-colors">
-              Immigration Chatbot
-            </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/" className="text-muted-foreground hover:text-accent transition-colors">
-                Home
-              </Link>
-              <Link href="/dashboard" className="text-muted-foreground hover:text-accent transition-colors">
-                Dashboard
-              </Link>
-            </div>
-          </div>
-        </nav>
+        <nav className="border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+    <Link href="/" className="text-xl font-bold text-foreground hover:text-accent transition-colors">
+      Immigration Chatbot
+    </Link>
+    <div className="flex items-center gap-6">
+      <Link href="/" className="text-muted-foreground hover:text-accent transition-colors">
+        Home
+      </Link>
+      <Link href="/dashboard" className="text-muted-foreground hover:text-accent transition-colors">
+        Dashboard
+      </Link>
+    </div>
+  </div>
+</nav>
 
         {/* Page content */}
         {children}
